@@ -75,7 +75,7 @@
         "state": {
           "program": "Program",
           "push": "Push",
-          "switch": "[%key:component::switch::entity_component::_::name%]"
+          "switch": "Switch"
         }
       },
       "temperature_unit": {
@@ -94,7 +94,7 @@
     },
     "binary_sensor": {
       "low_battery": {
-        "name": "[%key:component::sensor::entity_component::battery::name%]"
+        "name": "Low Battery"
       },
       "lock_motor_state": {
           "name": "Motor State"
@@ -102,7 +102,7 @@
     },
     "sensor": {
       "battery": {
-        "name": "[%key:component::sensor::entity_component::battery::name%]"
+        "name": "Battery"
       },
       "battery_charging": {
         "name": "Battery charging",
@@ -137,7 +137,7 @@
         "name": "[%key:component::sensor::entity_component::moisture::name%]"
       },
       "signal_strength": {
-        "name": "[%key:component::sensor::entity_component::signal_strength::name%]"
+        "name": "Signal Strength"
       },
       "temperature": {
         "name": "[%key:component::sensor::entity_component::temperature::name%]"
