@@ -18,11 +18,11 @@
       },
       "login": {
         "data": {
-          "access_id": "Tuya IoT Access ID",
-          "access_secret": "Tuya IoT Access Secret",
+          "access_id": "Tuya IoT Access ID / Client ID",
+          "access_secret": "Tuya IoT Access Secret / Client Secret",
           "country_code": "Country",
-          "password": "[%key:common::config_flow::data::password%]",
-          "username": "Account"
+          "password": "Password",
+          "username": "Account (in most cases your App Account E-Mail)"
         },
         "description": "Tuya BLE requires obtaining encryption key from Tuya cloud. Almost all devices only need to access the cloud once during setup.\n\nRefer to documentation of Tuya integration to retrive the cloud credentials https://www.home-assistant.io/integrations/tuya/\n\nEnter your Tuya credentials."
       }
@@ -205,7 +205,7 @@
         "name": "Reverse positions"
       },
       "switch": {
-        "name": "[%key:component::switch::entity_component::_::name%]"
+        "name": "Switch"
       },
       "lock_motor_state": {
           "name": "Motor State"
