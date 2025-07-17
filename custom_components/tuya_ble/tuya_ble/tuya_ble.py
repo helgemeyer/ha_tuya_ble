@@ -595,30 +595,7 @@ class TuyaBLEDevice:
         _LOGGER.debug("%s: Stop", self.address)
         await self._execute_disconnect()
 
-    def _disconnected(self, client: BleakClientWithServiceCache) -> None:
-        """Disconnected callback."""
-        was_paired = self._is_paired
-        self._is_paired = False
-        if self._expected_disconnect:
-            _LOGGER.debug(
-                "%s: Disconnected from device; RSSI: %s",
-                self.address,
-                self.rssi,
-            )
-            self._fire_disconnected_callbacks()
-            return
-        self._client = None
-        _LOGGER.warning(
-            "%s: Device unexpectedly disconnected; RSSI: %s",
-            self.address,
-            self.rssi,
-        )
-        _LOGGER.debug(
-            "%s: Scheduling reconnect; RSSI: %s",
-            self.address,
-            self.rssi,
-        )
-        asyncio.create_task(self._reconnect())
+
 
     def _disconnect(self) -> None:
         """Disconnect from device."""
@@ -780,20 +757,67 @@ class TuyaBLEDevice:
                 _LOGGER.error("%s: Not connected", self.address)
         else:
             _LOGGER.error("%s: No client device", self.address)
+            
+    def _disconnected(self, client: BleakClientWithServiceCache) -> None:
+        """Disconnected callback."""
+        was_paired = self._is_paired
+        self._is_paired = False
+        if self._expected_disconnect:
+            _LOGGER.debug(
+                "%s: Disconnected from device; RSSI: %s",
+                self.address,
+                self.rssi,
+            )
+            self._fire_disconnected_callbacks()
+            return
+        self._client = None
+        _LOGGER.warning(
+            "%s: Device unexpectedly disconnected; RSSI: %s",
+            self.address,
+            self.rssi,
+        )
+        _LOGGER.debug(
+            "%s: Scheduling reconnect; RSSI: %s",
+            self.address,
+            self.rssi,
+        )
+        asyncio.create_task(self._reconnect())
+    async def _keep_alive_loop(self):
+        """Send regular status updates to avoid idle disconnects."""
+        while True:
+            try:
+                if self._client and self._client.is_connected:
+                    _LOGGER.debug("%s: Sending keep-alive", self.address)
+                    await self._send_packet(
+                        TuyaBLECode.FUN_SENDER_DEVICE_STATUS, b"", wait_for_response=False
+                    )
+            except Exception as e:
+                _LOGGER.warning("%s: Keep-alive failed: %s", self.address, e)
+            await asyncio.sleep(20)
 
+    
     async def _reconnect(self) -> None:
-        """Attempt a reconnect"""
+        """Attempt a reconnect."""
         _LOGGER.debug("%s: Reconnect, ensuring connection", self.address)
         async with self._seq_num_lock:
             self._current_seq_num = 1
+
         try:
             if self._expected_disconnect:
                 return
+
             await self._ensure_connected()
+
+            if self._client and self._client.is_connected and not hasattr(self, "_keep_alive_started"):
+                self._keep_alive_started = True
+                asyncio.create_task(self._keep_alive_loop())
+
             if self._expected_disconnect:
                 return
+
             _LOGGER.debug("%s: Reconnect, connection ensured", self.address)
-        except BLEAK_EXCEPTIONS:  # BleakNotFoundError:
+
+        except BLEAK_EXCEPTIONS:
             _LOGGER.debug(
                 "%s: Reconnect, failed to ensure connection - backing off",
                 self.address,
@@ -802,6 +826,7 @@ class TuyaBLEDevice:
             await asyncio.sleep(BLEAK_BACKOFF_TIME)
             _LOGGER.debug("%s: Reconnecting again", self.address)
             asyncio.create_task(self._reconnect())
+
 
     @staticmethod
     def _calc_crc16(data: bytes) -> int:
