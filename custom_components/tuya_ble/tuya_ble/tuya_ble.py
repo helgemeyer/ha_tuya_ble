@@ -762,6 +762,7 @@ class TuyaBLEDevice:
         """Disconnected callback."""
         was_paired = self._is_paired
         self._is_paired = False
+        _LOGGER.warning("%s: Disconnected – resetting is_paired to False", self.address)
         if self._expected_disconnect:
             _LOGGER.debug(
                 "%s: Disconnected from device; RSSI: %s",
@@ -1190,6 +1191,9 @@ class TuyaBLEDevice:
         self, seq_num: int, response_to: int, code: TuyaBLECode, data: bytes
     ) -> None:
         result: int = 0
+        _LOGGER.debug("%s: Handle code %s (response_to: %s, data: %s)",
+              self.address, code.name, response_to, data.hex())
+
 
         match code:
             case TuyaBLECode.FUN_SENDER_DEVICE_INFO:
@@ -1294,6 +1298,7 @@ class TuyaBLEDevice:
                     result,
                 )
                 if result == 0:
+                    _LOGGER.info("%s: Device pairing successful", self.address)
                     future.set_result(result)
                 else:
                     future.set_exception(TuyaBLEDeviceError(result))
