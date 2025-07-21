@@ -2,6 +2,14 @@
 
 ## Overview
 
+This repo is for testing the Switch Robot from Tuya only, which is a little similar to Fingerbot Plus.
+It works to move the arm 
+- without errors
+- without ESP32 proxy (with a simple ASUS dongle connected to home assistant)
+- without polling every 30 seconds (and corresponding warnings).
+
+limitations: If you press the button to move arm on the device it updates only if you are still connected (e.g. 30 seconds after you have send last command). Other than that it will not be propagated to home assistant. Workaround possible via home assistant config.
+
 This integration supports Tuya devices connected via BLE.
 
 _Inspired by code of [@redphx](https://github.com/redphx/poc-tuya-ble-fingerbot)_
