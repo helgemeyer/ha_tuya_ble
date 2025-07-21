@@ -782,7 +782,7 @@ class TuyaBLEDevice:
             self.address,
             self.rssi,
         )
-        asyncio.create_task(self._reconnect())
+        _LOGGER.debug("%s: Reconnect intentionally skipped", self.address)
     async def _keep_alive_loop(self):
         """Send regular status updates to avoid idle disconnects."""
         while True:
@@ -811,7 +811,8 @@ class TuyaBLEDevice:
 
             if self._client and self._client.is_connected and not hasattr(self, "_keep_alive_started"):
                 self._keep_alive_started = True
-                asyncio.create_task(self._keep_alive_loop())
+                _LOGGER.debug("%s: Reconnect intentionally skipped", self.address)
+
 
             if self._expected_disconnect:
                 return
@@ -826,7 +827,8 @@ class TuyaBLEDevice:
             )
             await asyncio.sleep(BLEAK_BACKOFF_TIME)
             _LOGGER.debug("%s: Reconnecting again", self.address)
-            asyncio.create_task(self._reconnect())
+            _LOGGER.debug("%s: Reconnect intentionally skipped", self.address)
+
 
 
     @staticmethod
