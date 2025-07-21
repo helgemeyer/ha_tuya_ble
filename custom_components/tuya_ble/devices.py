@@ -3,6 +3,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
+from datetime import timedelta
 
 import logging
 from homeassistant.const import CONF_ADDRESS, CONF_DEVICE_ID
