@@ -794,7 +794,7 @@ class TuyaBLEDevice:
                     )
             except Exception as e:
                 _LOGGER.warning("%s: Keep-alive failed: %s", self.address, e)
-            await asyncio.sleep(20)
+            await asyncio.sleep(1800)
 
     
     async def _reconnect(self) -> None:
