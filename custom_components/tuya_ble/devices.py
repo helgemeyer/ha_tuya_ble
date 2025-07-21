@@ -254,6 +254,7 @@ class TuyaBLECoordinator(DataUpdateCoordinator[None]):
             hass,
             _LOGGER,
             name=DOMAIN,
+            update_interval=None,
         )
         self._device = device
         self._disconnected: bool = True
